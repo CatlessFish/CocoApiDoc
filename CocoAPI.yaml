@@ -1,0 +1,562 @@
+openapi: 3.0.3
+info:
+  description: "CrispyCoconut项目API文档"
+  version: 0.1.0
+  title: CrispyCoconut
+servers:
+  - url: http://localhost:3000/api
+tags:
+  - name: User Module
+    description: 用户模块
+  - name: MessageBox Module
+    description: 提问箱模块
+  - name: Wall Module
+    description: 表白墙模块
+paths:
+  /example/post:
+    post:
+      tags:
+        - Example
+      description: Hi
+      operationId: HiPost
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+                        
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/login:
+    post:
+      tags:
+        - User Module
+      summary: 用户登录
+      operationId: userLogin
+      description: 用户登录
+      requestBody:
+        description: "Username and Password"
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: 'user123'
+                password:
+                  type: string
+                  example: 'password123'
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: >-
+            A status code of 0 means the request is successful; others mean
+            errors, if there is an error, please attach the error messages.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          token:
+                            type: string
+                            example: jwt.token.signed
+        
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+                    
+  /user/register:
+    post:
+      tags:
+        - User Module
+      summary: 用户注册
+      operationId: userRegister
+      description: 用户注册
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: 'user123'
+                password:
+                  type: string
+                  example: 'password123'
+                email:
+                  type: string
+                  format: email
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          $ref: '#/components/responses/GeneralSuccessResp'
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+  /user/profile:
+    get:
+      tags:
+        - User Module
+      description: 获取用户个人信息
+      operationId: userProfile
+      security:
+        - tokenHeader: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfile'
+                        
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+            
+  /wall/getAllEntries:
+    get:
+      tags:
+        - Wall Module
+      description: 获取所有表白墙帖子
+      operationId: wallGetAllEntries
+      security:
+        - tokenHeader: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: 
+                          $ref: '#/components/schemas/WallEntry'
+                  
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        
+  /wall/createOneEntry:
+    post:
+      tags:
+        - Wall Module
+      description: 新建一条表白墙帖子
+      operationId: wallCreateOneEntry
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                content:
+                  type: object
+                  description: 帖子的内容，以一个对象表示
+                  example:
+                    text: Hello World
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/WallEntry'
+                        
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+          
+  /wall/deleteOneEntry:
+    post:
+      tags:
+        - Wall Module
+      description: 删除一条表白墙帖子
+      operationId: wallDeleteOneEntry
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                wallEntryId:
+                  description: 待删除的表白墙帖子Mongo ID
+                  type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: OK
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        
+  /wall/getAllPostInEntry:
+    post:
+      tags:
+        - Wall Module
+      description: 获取表白墙上一条帖子的所有跟帖
+      operationId: wallGetAllPostInEntry
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                wallEntryId:
+                  description: 帖子Entry的Mongo ID
+                  type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Post'
+
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /wall/addPostToEntry:
+    post:
+      tags:
+        - Wall Module
+      description: 在表白墙上一条帖子下添加一条跟帖
+      operationId: wallAddPostToEntry
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                wallEntryId:
+                  description: 帖子Entry的Mongo ID
+                  type: string
+                content:
+                  description: 跟帖的内容，以一个对象表示
+                  type: object
+                  example:
+                    text: Hello World
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Post'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+ 
+  /wall/deletePostInEntry:
+    post:
+      tags:
+        - Wall Module
+      description: 删除表白墙上一条帖子下的一条跟帖
+      operationId: wallDeletePostInEntry
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                wallEntryId:
+                  description: 帖子Entry的Mongo ID
+                  type: string
+                postId:
+                  description: 跟帖的Mongo ID
+                  type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /wall/updatePostInEntry:
+    post:
+      tags:
+        - Wall Module
+      description: 更新表白墙上一条帖子下的一条跟帖
+      operationId: wallUpdatePostInEntry
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                wallEntryId:
+                  description: 帖子Entry的Mongo ID
+                  type: string
+                postId:
+                  description: 跟帖的Mongo ID
+                  type: string
+                content:
+                  description: 跟帖的内容，以一个对象表示
+                  type: object
+                  example:
+                    text: Hello World
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Post'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    tokenHeader:
+      type: http
+      scheme: "bearer"
+      bearerFormat: "JWT"
+  
+  schemas:
+    UserProfile:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Mongo ID
+        username:
+          type: string
+
+    Post:
+      description: 帖子
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Mongo ID
+        owner:
+          type: string
+          description: User ID of the owner
+        createdAt:
+          type: object
+          description: JS Date object of creation time
+        updatedAt:
+          type: object
+          description: JS Date object of update time
+        private:
+          type: boolean
+          description: 是否为私密帖
+        visibleTo:
+          type: array
+          description: 可见用户列表
+          items:
+            type: string
+            description: Mongo ObjectID of the user
+        entryAt:
+          type: string
+          description: Mongo ObjectID of the entry
+        content:
+          type: object
+          description: 帖子的内容，以一个对象表示
+          example:
+            text: Hello World
+          
+    WallEntry:
+      description:
+        Defines a Entry in the Wall 表白墙帖子
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Mongo ID
+        owner:
+          type: string
+          description: User ID of the owner
+        createdAt:
+          type: object
+          description: JS Date object of creation time
+        updatedAt:
+          type: object
+          description: JS Date object of update time
+        initialPost:
+          type: string
+          description: Mongo ObjectID of the initial post
+        posts:
+          type: array
+          description: Array of ObjectIDs of the posts in the entry
+          items:
+            type: string
+            description: Mongo ObjectID of the referenced post
+            
+    GeneralSuccess:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+        error_msg:
+          type: string
+          example: OK
+        # data:
+        #   type: object
+        #   example: null
+          
+    GeneralFail:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        error_msg:
+          type: string
+          example: Error occured
+        data:
+          type: object
+          example: null
+            
+  responses:
+    GeneralSuccessResp:
+      description: 请求成功
+      content:
+        'application/json':
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/GeneralSuccess'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    example: OK
+              
+    GeneralFailResp:
+      description: 请求失败
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/GeneralFail'
+            
+    Unauthorized:
+      description: 授权验证失败
+      content:
+        'application/json':
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/GeneralFail'
+              - type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 401
+                  error_msg:
+                    type: string
+                    example: Unauthorized
+              
+          
+          
+          

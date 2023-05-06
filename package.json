@@ -1,0 +1,20 @@
+{
+  "name": "cocoapidoc",
+  "version": "1.0.0",
+  "description": "API Documentation for CrispyCoconut",
+  "dependencies": {
+    "http-server": "^0.12.3"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "http-server -p 8080",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "swagger",
+    "openapi",
+    "api"
+  ],
+  "author": "CatlessFish",
+  "license": "ISC"
+}
