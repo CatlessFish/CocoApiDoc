@@ -253,7 +253,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
         
-  /wall/getAllPostInEntry:
+  /wall/getAllPostsInEntry:
     post:
       tags:
         - Wall Module
@@ -416,6 +416,457 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  /msgBox/getMsgBoxByOwnerId:
+    get:
+      tags:
+        - MessageBox Module
+      description: 获取用户的提问箱
+      operationId: msgBoxGetMsgBoxByOwnerId
+      security:
+        - tokenHeader: []
+      parameters:
+        - name: ownerId
+          in: query
+          description: 用户的Mongo ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MsgBox'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /msgBox/getMsgBoxById:
+    get:
+      tags:
+        - MessageBox Module
+      description: 根据ID获取提问箱
+      operationId: msgBoxGetMsgBoxById
+      security:
+        - tokenHeader: []
+      parameters:
+        - name: msgBoxId
+          in: query
+          description: 提问箱的Mongo ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MsgBox'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /msgBox/createOneMsgBox:
+    post:
+      tags:
+        - MessageBox Module
+      description: 创建一个提问箱
+      operationId: msgBoxCreateOneMsgBox
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                content:
+                  description: 提问箱的内容，以一个对象表示
+                  type: object
+                  example:
+                    description: 这是我的提问箱
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MsgBox'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /msgBox/updateOneMsgBox:
+    post:
+      tags:
+        - MessageBox Module
+      description: 更新一个提问箱
+      operationId: msgBoxUpdateOneMsgBox
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                msgBoxId:
+                  description: 提问箱的Mongo ID
+                  type: string
+                content:
+                  description: 提问箱的内容，以一个对象表示
+                  type: object
+                  example:
+                    description: 这是我的提问箱
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MsgBox'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  
+  /msgBox/deleteMsgBoxById:
+    post:
+      tags:
+        - MessageBox Module
+      description: 删除一个提问箱
+      operationId: msgBoxDeleteMsgBoxById
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                msgBoxId:
+                  description: 提问箱的Mongo ID
+                  type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /msgBox/getAllEntriesInMsgBox:
+    get:
+      tags:
+        - MessageBox Module
+      description: 获取提问箱中的所有条目
+      operationId: msgBoxGetAllEntriesInMsgBox
+      security:
+        - tokenHeader: []
+      parameters:
+        - name: msgBoxId
+          in: query
+          description: 提问箱的Mongo ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MsgBoxEntry'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /msgBox/createOneEntryInMsgBox:
+    post:
+      tags:
+        - MessageBox Module
+      description: 在提问箱中创建一个条目
+      operationId: msgBoxCreateOneEntryInMsgBox
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                msgBoxId:
+                  description: 提问箱的Mongo ID
+                  type: string
+                content:
+                  description: 条目的内容，以一个对象表示
+                  type: object
+                  example:
+                    description: 这是我的提问箱条目
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MsgBoxEntry'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /msgBox/deleteOneEntryInMsgBox:
+    post:
+      tags:
+        - MessageBox Module
+      description: 删除提问箱中的一个条目
+      operationId: msgBoxDeleteOneEntryInMsgBox
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                msgBoxId:
+                  description: 提问箱的Mongo ID
+                  type: string
+                entryId:
+                  description: 条目的Mongo ID
+                  type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /msgBox/getAllPostsInMsgBoxEntry:
+    get:
+      tags:
+        - MessageBox Module
+      description: 获取提问箱条目中的所有帖子
+      operationId: msgBoxGetAllPostsInMsgBoxEntry
+      security:
+        - tokenHeader: []
+      parameters:
+        - name: entryId
+          in: query
+          description: 条目的Mongo ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Post'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /msgBox/createOnePostInMsgBoxEntry:
+    post:
+      tags:
+        - MessageBox Module
+      description: 在提问箱条目中创建一个帖子
+      operationId: msgBoxCreateOnePostInMsgBoxEntry
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                entryId:
+                  description: 条目的Mongo ID
+                  type: string
+                content:
+                  description: 帖子的内容，以一个对象表示
+                  type: object
+                  example:
+                    description: 这是我的帖子
+                    private: false
+                    visibleTo: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Post'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /msgBox/deleteOnePostInMsgBoxEntry:
+    post:
+      tags:
+        - MessageBox Module
+      description: 删除提问箱条目中的一个帖子
+      operationId: msgBoxDeleteOnePostInMsgBoxEntry
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                entryId:
+                  description: 条目的Mongo ID
+                  type: string
+                postId:
+                  description: 帖子的Mongo ID
+                  type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /msgBox/updateOnePostInMsgBoxEntry:
+    post:
+      tags:
+        - MessageBox Module
+      description: 更新提问箱条目中的一个帖子
+      operationId: msgBoxUpdateOnePostInMsgBoxEntry
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                entryId:
+                  description: 条目的Mongo ID
+                  type: string
+                postId:
+                  description: 帖子的Mongo ID
+                  type: string
+                content:
+                  description: 帖子的内容，以一个对象表示
+                  type: object
+                  example:
+                    description: 这是我的帖子
+                    private: false
+                    visibleTo: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Post'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
 components:
   securitySchemes:
     tokenHeader:
@@ -434,7 +885,7 @@ components:
           type: string
 
     Post:
-      description: 帖子
+      description: 帖子，包括表白墙帖子和提问箱帖子
       type: object
       properties:
         _id:
@@ -493,7 +944,70 @@ components:
           items:
             type: string
             description: Mongo ObjectID of the referenced post
+
+    MsgBox:
+      description: 用户的提问箱
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Mongo ID
+        owner:
+          type: string
+          description: User ID of the owner
+        createdAt:
+          type: object
+          description: JS Date object of creation time
+        updatedAt:
+          type: object
+          description: JS Date object of update time
+        content:
+          type: object
+          description: 帖子的内容，以一个对象表示
+          example:
+            description: 欢迎提问
+        settings:
+          type: object
+          description: 提问箱的设置
+        entries:
+          type: array
+          description: Array of ObjectIDs of the entries in the message box
+          items:
+            type: string
+            description: Mongo ObjectID of the referenced entry
             
+    MsgBoxEntry:
+      description: 用户提问箱中的条目
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Mongo ID
+        boxOwner:
+          type: string
+          description: User ID of the owner of the message box
+        entryOwner:
+          type: string
+          description: User ID of the owner of the entry
+        createdAt:
+          type: object
+          description: JS Date object of creation time
+        updatedAt:
+          type: object
+          description: JS Date object of update time
+        private:
+          type: boolean
+          description: 是否为私密条目
+        initialPost:
+          type: string
+          description: Mongo ObjectID of the initial post
+        posts:
+          type: array
+          description: Array of ObjectIDs of the posts in the entry
+          items:
+            type: string
+            description: Mongo ObjectID of the referenced post
+
     GeneralSuccess:
       type: object
       properties:
