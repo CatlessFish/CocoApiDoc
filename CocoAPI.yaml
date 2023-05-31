@@ -5,13 +5,26 @@ info:
   title: CrispyCoconut
 servers:
   - url: http://localhost:3000/api
+  - url: http://catlessfish.cc:5100/api/
+  - url: https://coco.catlessfish.cc/api/
 tags:
+  - name: Example
+    description: API示例
   - name: User Module
-    description: 用户模块
+    description: >-
+      用户模块，包括用户登录、注册、获取个人信息等功能
   - name: MessageBox Module
-    description: 提问箱模块
+    description: >-
+      提问箱模块，以Entry表示一条初始提问，以Post表示跟帖
   - name: Wall Module
-    description: 表白墙模块
+    description: >-
+      表白墙模块，以Entry表示一条表白墙帖子，以Post表示跟帖
+  - name: Square Module
+    description: >-
+      广场模块，以Entry表示一个提问箱入口
+  - name: Post Module
+    description: >-
+      帖子模块，以Post表示一个帖子
 paths:
   /example/post:
     post:
@@ -652,7 +665,7 @@ paths:
                   description: 条目的内容，以一个对象表示
                   type: object
                   example:
-                    description: 这是我的提问箱条目
+                    text: 你好！今天吃饭了吗？
       responses:
         '200':
           description: 成功
@@ -764,7 +777,7 @@ paths:
                   description: 帖子的内容，以一个对象表示
                   type: object
                   example:
-                    description: 这是我的帖子
+                    text: 这是我的帖子
                     private: false
                     visibleTo: []
       responses:
@@ -845,7 +858,7 @@ paths:
                   description: 帖子的内容，以一个对象表示
                   type: object
                   example:
-                    description: 这是我的帖子
+                    text: 这是我的帖子
                     private: false
                     visibleTo: []
       responses:
@@ -860,6 +873,140 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/Post'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /post/getOnePostById:
+    get:
+      tags:
+        - Post Module
+      description: 通过Mongo ID获取一个帖子
+      operationId: postGetOnePostById
+      security:
+        - tokenHeader: []
+      parameters:
+        - name: postId
+          in: query
+          description: 帖子的Mongo ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Post'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /square/getAll:
+    get:
+      tags:
+        - Square Module
+      description: 获取广场中的所有提问箱入口
+      operationId: squareGetAll
+      security:
+        - tokenHeader: []
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SquareEntry'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /square/addOne:
+    post:
+      tags:
+        - Square Module
+      description: 添加一个提问箱入口
+      operationId: squareAddOne
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                owner:
+                  description: 入口的提问箱所有者的Mongo ID
+                  type: string
+                msgBoxId:
+                  description: 入口对应的提问箱的Mongo ID
+                  type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SquareEntry'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /square/deleteOne:
+    post:
+      tags:
+        - Square Module
+      description: 删除一个提问箱入口
+      operationId: squareDeleteOne
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                squareEntryId:
+                  description: 入口的Mongo ID
+                  type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
           
         '400':
           $ref: '#/components/responses/GeneralFailResp'
@@ -1008,6 +1155,26 @@ components:
             type: string
             description: Mongo ObjectID of the referenced post
 
+    SquareEntry:
+      description: 广场中的提问箱入口
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Mongo ID
+        owner:
+          type: string
+          description: User ID of the owner
+        createdAt:
+          type: object
+          description: JS Date object of creation time
+        updatedAt:
+          type: object
+          description: JS Date object of update time
+        msgBoxId:
+          type: string
+          description: Mongo ObjectID of the message box
+
     GeneralSuccess:
       type: object
       properties:
@@ -1066,7 +1233,7 @@ components:
                 properties:
                   code:
                     type: integer
-                    example: 401
+                    example: -2
                   error_msg:
                     type: string
                     example: Unauthorized
