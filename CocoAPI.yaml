@@ -986,7 +986,7 @@ paths:
     post:
       tags:
         - Square Module
-      description: 删除一个提问箱入口
+      description: 删除一个广场上的提问箱入口
       operationId: squareDeleteOne
       security:
         - tokenHeader: []
@@ -998,6 +998,38 @@ paths:
               properties:
                 squareEntryId:
                   description: 入口的Mongo ID
+                  type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+          
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /square/deleteOneByMsgBoxId:
+    post:
+      tags:
+        - Square Module
+      description: 删除一个广场上的提问箱入口
+      operationId: squareDeleteOneByMsgBoxId
+      security:
+        - tokenHeader: []
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                msgBoxId:
+                  description: 提问箱的Mongo ID
                   type: string
       responses:
         '200':
