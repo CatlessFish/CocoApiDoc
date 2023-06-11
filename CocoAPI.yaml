@@ -161,6 +161,40 @@ paths:
           
         '401':
           $ref: '#/components/responses/Unauthorized'
+
+  /user/getUserById:
+    get:
+      tags:
+        - User Module
+      description: 通过用户ID获取用户信息
+      operationId: userGetUserById
+      security:
+        - tokenHeader: []
+      parameters:
+        - name: userId
+          in: query
+          description: 用户ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            'application/json':
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/GeneralSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfile'
+                        
+        '400':
+          $ref: '#/components/responses/GeneralFailResp'
+          
+        '401':
+          $ref: '#/components/responses/Unauthorized'
             
   /wall/getAllEntries:
     get:
